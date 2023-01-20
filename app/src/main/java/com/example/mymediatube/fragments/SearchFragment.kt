@@ -11,6 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.mymediatube.databinding.FragmentSearchBinding
 import com.example.mymediatube.ext.activityCompat
+import com.example.mymediatube.ext.app
 import com.example.mymediatube.viewmodels.ConnectionViewModel
 import com.example.mymediatube.viewmodels.SearchViewModel
 
@@ -18,7 +19,9 @@ private const val TAG = "SearchFragment"
 // The SearchView should be in the layout of the searchable activity
 class SearchFragment: Fragment() {
 
-    private val viewModel: SearchViewModel by viewModels()
+    private val viewModel: SearchViewModel by viewModels() {
+        SearchViewModel.Factory(app.dataRepository)
+    }
     private val connectionViewModel: ConnectionViewModel by activityViewModels()
 
     override fun onCreateView(

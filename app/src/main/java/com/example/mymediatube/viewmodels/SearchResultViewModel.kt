@@ -1,20 +1,20 @@
 package com.example.mymediatube.viewmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.mymediatube.ext.asSearchData
-import com.example.mymediatube.helper.YoutubeHelper
-import com.example.mymediatube.models.SearchData
+import androidx.lifecycle.*
+import com.example.mymediatube.models.UISearchData
+import com.example.mymediatube.repository.DataRepository
+import com.example.mymediatube.source.asUIDataList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class SearchResultViewModel: ViewModel() {
+class SearchResultViewModel(
+    private val dataRepository: DataRepository
+): ViewModel() {
 
-    private val _searchData = MutableLiveData<List<SearchData>>()
-    val searchData: LiveData<List<SearchData>> = _searchData
+    private val _searchData = MutableLiveData<List<UISearchData>>()
+    val searchData: LiveData<List<UISearchData>> = _searchData
 
     private var loadPending = false
     private var lastQuery: String? = null
@@ -32,22 +32,12 @@ class SearchResultViewModel: ViewModel() {
 
     private fun performSearch(query: String) {
         searchJob?.cancel()
-        val client = YoutubeHelper.getClient()
         searchJob = viewModelScope.launch(Dispatchers.IO) {
-            val result = YoutubeHelper.execute(
-                client.search()
-                    .list("id,snippet")
-                    .setFields("items(id,snippet(title,thumbnails))")
-                    .setQ(query)
-                    .setMaxResults(25L)
-            )
-
-            val searches = result.items
-            val newSearch = mutableListOf<SearchData>()
-            for (search in searches) {
-                newSearch.add(search.asSearchData())
-            }
-            _searchData.postValue(newSearch)
+            dataRepository.getSearchResults(query)
+                .map { it.asUIDataList() }
+                .collect {
+                    _searchData.postValue(it)
+                }
         }
     }
 
@@ -55,4 +45,15 @@ class SearchResultViewModel: ViewModel() {
         performSearch(it)
         loadPending = false
     }
+
+    class Factory(private val dataRepository: DataRepository) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(SearchResultViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return SearchResultViewModel(dataRepository) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
+    }
+
 }

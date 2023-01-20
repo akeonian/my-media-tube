@@ -1,18 +1,16 @@
 package com.example.mymediatube.viewmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.mymediatube.helper.YoutubeHelper
+import androidx.lifecycle.*
+import com.example.mymediatube.repository.DataRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class SearchViewModel: ViewModel() {
+class SearchViewModel(
+    private val dataRepository: DataRepository
+): ViewModel() {
 
-    private val maxSuggestions = 6L
     private val smallSearchDelay = 1000L
     private val _suggestions = MutableLiveData<List<String>>()
     val suggestions: LiveData<List<String>> = _suggestions
@@ -22,26 +20,12 @@ class SearchViewModel: ViewModel() {
 
     private fun searchSuggestions(keyword: String) {
         job?.cancel()
-        val client = YoutubeHelper.getClient()
         job = viewModelScope.launch(Dispatchers.IO) {
             // If the keyword is too small wait for user to type more
             if (keyword.length < 4) delay(smallSearchDelay)
-
-            // TODO: change suggestion search strategy
-            val result = YoutubeHelper.execute(
-                client.search()
-                    .list("snippet")
-                    .setFields("items(snippet/title)")
-                    .setQ(keyword)
-                    .setMaxResults(maxSuggestions)
-            )
-
-            val newSuggestions = mutableListOf<String>()
-            val results = result.items
-            for (r in results) {
-                newSuggestions.add(r.snippet.title)
+            dataRepository.getSuggestions(keyword).collect {
+                _suggestions.postValue(it)
             }
-            _suggestions.postValue(newSuggestions)
         }
     }
 
@@ -58,4 +42,15 @@ class SearchViewModel: ViewModel() {
         searchSuggestions(it)
         pendingKeyword = null
     }
+    
+        class Factory(private val dataRepository: DataRepository) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(SearchViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return SearchViewModel(dataRepository) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
+    }
+
 }
