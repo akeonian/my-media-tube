@@ -3,19 +3,19 @@ package com.example.mymediatube.models
 import android.net.Uri
 import androidx.recyclerview.widget.DiffUtil
 
-data class SearchData(
+data class UISearchData(
     val id: String,
     val title: String,
     val thumbnail: Uri
 ) {
 
     companion object {
-        val diffCallback = object: DiffUtil.ItemCallback<SearchData>() {
-            override fun areItemsTheSame(oldItem: SearchData, newItem: SearchData): Boolean {
+        val diffCallback = object: DiffUtil.ItemCallback<UISearchData>() {
+            override fun areItemsTheSame(oldItem: UISearchData, newItem: UISearchData): Boolean {
                 return oldItem.id == newItem.id
             }
 
-            override fun areContentsTheSame(oldItem: SearchData, newItem: SearchData): Boolean {
+            override fun areContentsTheSame(oldItem: UISearchData, newItem: UISearchData): Boolean {
                 return oldItem == newItem
             }
 

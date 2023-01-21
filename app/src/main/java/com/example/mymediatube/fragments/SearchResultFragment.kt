@@ -12,6 +12,7 @@ import com.example.mymediatube.R
 import com.example.mymediatube.adapters.SearchAdapter
 import com.example.mymediatube.databinding.FragmentSearchResultBinding
 import com.example.mymediatube.ext.activityCompat
+import com.example.mymediatube.ext.app
 import com.example.mymediatube.viewmodels.ConnectionViewModel
 import com.example.mymediatube.viewmodels.SearchResultViewModel
 
@@ -19,7 +20,9 @@ private const val TAG = "SearchResultFragment"
 class SearchResultFragment: Fragment(), MenuProvider {
 
     private val navigationArgs: SearchResultFragmentArgs by navArgs()
-    private val viewModel: SearchResultViewModel by viewModels()
+    private val viewModel: SearchResultViewModel by viewModels() {
+        SearchResultViewModel.Factory(app.dataRepository)
+    }
     private val connectionViewModel: ConnectionViewModel by activityViewModels()
 
     override fun onCreateView(

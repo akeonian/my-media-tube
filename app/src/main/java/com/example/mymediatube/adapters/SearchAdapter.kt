@@ -6,16 +6,16 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.mymediatube.databinding.ListItemSearchBinding
-import com.example.mymediatube.models.SearchData
+import com.example.mymediatube.models.UISearchData
 
 class SearchAdapter(
-    private val clickListener: (SearchData) -> Unit
-): ListAdapter<SearchData, SearchAdapter.ViewHolder> (SearchData.diffCallback) {
+    private val clickListener: (UISearchData) -> Unit
+): ListAdapter<UISearchData, SearchAdapter.ViewHolder> (UISearchData.diffCallback) {
 
     class ViewHolder(
         private val binding: ListItemSearchBinding
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: SearchData) {
+        fun bind(item: UISearchData) {
             binding.title.text = item.title
             // TODO: Configure the Glide App module
             Glide.with(binding.image)

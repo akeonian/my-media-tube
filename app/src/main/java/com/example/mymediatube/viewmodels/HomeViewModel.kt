@@ -1,56 +1,49 @@
 package com.example.mymediatube.viewmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.mymediatube.ext.asSearchData
-import com.example.mymediatube.helper.YoutubeHelper
-import com.example.mymediatube.models.SearchData
-import com.google.api.client.util.DateTime
+import androidx.lifecycle.*
+import com.example.mymediatube.models.UISearchData
+import com.example.mymediatube.repository.DataRepository
+import com.example.mymediatube.source.asUIDataList
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 private const val TAG = "HomeViewModel"
 
-class HomeViewModel: ViewModel() {
+class HomeViewModel(
+    private val dataRepository: DataRepository
+): ViewModel() {
 
-    private val _homeData = MutableLiveData<List<SearchData>>()
+    private val _homeData = MutableLiveData<List<UISearchData>>()
     private var loadPending = true
-    val homeData: LiveData<List<SearchData>> = _homeData
+    val homeData: LiveData<List<UISearchData>> = _homeData
     val isLoadPending get() = loadPending
 
+    // Should not load until loadHomeData is called
     fun loadHomeData(pending: Boolean) {
         loadPending = pending
         if (!pending) loadHomeDataFromApi()
     }
 
     private fun loadHomeDataFromApi() {
-        val service = YoutubeHelper.getClient()
-
         viewModelScope.launch(Dispatchers.IO) {
-            val monthAgo = Calendar.getInstance().apply {
-                add(Calendar.DAY_OF_MONTH, -30)
-            }.time
-            val result = YoutubeHelper.execute(service.search()
-                .list("id,snippet")
-                .setFields("items(id,snippet(title,thumbnails))")
-                .setOrder("viewCount")
-                .setPublishedAfter(DateTime(monthAgo))
-                .setMaxResults(25L)
-            )
-
-            val searches = result.items
-            val channelInfo = mutableListOf<SearchData>()
-            if (searches != null) {
-                for (search in searches) {
-                    channelInfo.add(search.asSearchData())
-                }
+            dataRepository.getHomeData()
+                .map { it.asUIDataList() }
+                .collect {
+                _homeData.postValue(it)
             }
-            _homeData.postValue(channelInfo)
         }
     }
 
     fun loadIfPending() = if (loadPending) loadHomeData(false) else Unit
+
+    class Factory(private val dataRepository: DataRepository) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return HomeViewModel(dataRepository) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
+    }
 }

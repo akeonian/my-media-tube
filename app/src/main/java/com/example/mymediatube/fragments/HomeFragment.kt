@@ -11,13 +11,16 @@ import com.example.mymediatube.R
 import com.example.mymediatube.adapters.SearchAdapter
 import com.example.mymediatube.databinding.FragmentHomeBinding
 import com.example.mymediatube.ext.activityCompat
+import com.example.mymediatube.ext.app
 import com.example.mymediatube.viewmodels.ConnectionViewModel
 import com.example.mymediatube.viewmodels.HomeViewModel
 
 private const val TAG = "HomeFragment"
 class HomeFragment: Fragment(), MenuProvider {
 
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by viewModels() {
+        HomeViewModel.Factory(app.dataRepository)
+    }
     private val connectedViewModel: ConnectionViewModel by activityViewModels()
 
     override fun onCreateView(
