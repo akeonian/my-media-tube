@@ -19,7 +19,7 @@ private const val TAG = "SearchFragment"
 // The SearchView should be in the layout of the searchable activity
 class SearchFragment: Fragment() {
 
-    private val viewModel: SearchViewModel by viewModels() {
+    private val viewModel: SearchViewModel by viewModels {
         SearchViewModel.Factory(app.dataRepository)
     }
     private val connectionViewModel: ConnectionViewModel by activityViewModels()
@@ -30,7 +30,7 @@ class SearchFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentSearchBinding.inflate(
-            inflater, container, false);
+            inflater, container, false)
 
         val searchManager = getSystemService(
             requireContext(), SearchManager::class.java)

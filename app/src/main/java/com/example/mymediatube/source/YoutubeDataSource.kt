@@ -30,6 +30,14 @@ class YoutubeDataSource(
         newSearch
     }
 
+    override suspend fun saveSearchResults(data: List<SearchData>) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun clearSearchResults() {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun getHomeData(): List<SearchData> = withContext(ioDispatcher) {
         val monthAgo = Calendar.getInstance().apply {
             add(Calendar.DAY_OF_MONTH, -30)
@@ -51,6 +59,14 @@ class YoutubeDataSource(
             }
         }
         channelInfo
+    }
+
+    override suspend fun saveHomeData(data: List<SearchData>) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun clearHomeData() {
+        TODO("Not yet implemented")
     }
 
     override suspend fun getSuggestions(keyword: String): List<String> = withContext(ioDispatcher) {

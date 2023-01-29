@@ -44,8 +44,14 @@ class SearchResultFragment: Fragment(), MenuProvider {
         viewModel.searchData.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.performSearch()
+        }
+        viewModel.showRefreshing.observe(viewLifecycleOwner) {
+            binding.swipeRefreshLayout.isRefreshing = it == true
+        }
         connectionViewModel.isConnectedData.observe(viewLifecycleOwner) {
-            if (it) viewModel.performSearch(false, navigationArgs.query)
+            if (it) viewModel.performSearch(navigationArgs.query)
         }
 
         return binding.root

@@ -5,7 +5,6 @@ import com.example.mymediatube.models.UISearchData
 import com.example.mymediatube.repository.DataRepository
 import com.example.mymediatube.source.asUIDataList
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 private const val TAG = "HomeViewModel"
@@ -15,27 +14,29 @@ class HomeViewModel(
 ): ViewModel() {
 
     private val _homeData = MutableLiveData<List<UISearchData>>()
-    private var loadPending = true
+    private val isLoading = MutableLiveData(false)
+    val showRefreshing: LiveData<Boolean> = isLoading
     val homeData: LiveData<List<UISearchData>> = _homeData
-    val isLoadPending get() = loadPending
+
+    private var alreadyLoaded = false
 
     // Should not load until loadHomeData is called
-    fun loadHomeData(pending: Boolean) {
-        loadPending = pending
-        if (!pending) loadHomeDataFromApi()
+    fun loadHomeData() {
+        loadHomeDataFromApi()
     }
 
     private fun loadHomeDataFromApi() {
+        isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
-            dataRepository.getHomeData()
-                .map { it.asUIDataList() }
-                .collect {
-                _homeData.postValue(it)
-            }
+            val list = dataRepository.getHomeData().asUIDataList()
+            _homeData.postValue(list)
+            isLoading.postValue(false)
         }
     }
 
-    fun loadIfPending() = if (loadPending) loadHomeData(false) else Unit
+    fun loadIfNotLoaded() {
+        if (isLoading.value == false && !alreadyLoaded) loadHomeData()
+    }
 
     class Factory(private val dataRepository: DataRepository) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
