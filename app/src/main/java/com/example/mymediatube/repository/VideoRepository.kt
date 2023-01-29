@@ -2,30 +2,38 @@ package com.example.mymediatube.repository
 
 import com.example.mymediatube.source.DataSource
 import com.example.mymediatube.source.SearchData
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import java.net.UnknownHostException
 
 class VideoRepository(
-    private val localDataSource: DataSource, // TODO: Use localDataSource when no internet
+    private val localDataSource: DataSource,
     private val remoteDataSource: DataSource
 ): DataRepository {
 
-    override fun getSearchResults(query: String) = flow {
-        val latestSearchResult = remoteDataSource.getSearchResults(query)
-        emit(latestSearchResult)
-        // TODO: Implement remit logic
+
+    override suspend fun getSearchResults(query: String): List<SearchData> {
+        return try {
+            val temp = remoteDataSource.getSearchResults(query)
+            localDataSource.clearSearchResults()
+            localDataSource.saveSearchResults(temp)
+            temp
+        } catch (e: UnknownHostException) {
+            localDataSource.getSearchResults(query)
+        }
     }
 
-    override fun getHomeData() = flow {
-        val latestHomeData = remoteDataSource.getHomeData()
-        emit(latestHomeData)
-        // TODO: Implement remit logic
+    override suspend fun getHomeData(): List<SearchData> {
+        return try {
+            val temp = remoteDataSource.getHomeData()
+            localDataSource.clearHomeData()
+            localDataSource.saveHomeData(temp)
+            temp
+        } catch (e: UnknownHostException) {
+            localDataSource.getHomeData()
+        }
     }
 
-    override fun getSuggestions(keyword: String) = flow {
-        val latestHomeData = remoteDataSource.getSuggestions(keyword)
-        emit(latestHomeData)
-        // TODO: Implement remit logic
+    override suspend fun getSuggestions(keyword: String): List<String> {
+        return remoteDataSource.getSuggestions(keyword)
     }
 
 }

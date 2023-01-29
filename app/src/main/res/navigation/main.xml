@@ -31,9 +31,5 @@
     <action
         android:id="@+id/showSearchResult"
         app:destination="@id/searchResultFragment" />
-    <activity
-        android:id="@+id/searchActivity"
-        android:name="com.example.mymediatube.SearchActivity"
-        android:label="SearchActivity" />
 
 </navigation>

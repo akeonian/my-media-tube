@@ -5,10 +5,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface DataRepository {
 
-    fun getSearchResults(query: String): Flow<List<SearchData>>
+    suspend fun getSearchResults(query: String): List<SearchData>
 
-    fun getHomeData(): Flow<List<SearchData>>
+    suspend fun getHomeData(): List<SearchData>
 
-    fun getSuggestions(keyword: String): Flow<List<String>>
+    suspend fun getSuggestions(keyword: String): List<String>
 
 }

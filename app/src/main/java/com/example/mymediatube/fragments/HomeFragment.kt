@@ -18,7 +18,7 @@ import com.example.mymediatube.viewmodels.HomeViewModel
 private const val TAG = "HomeFragment"
 class HomeFragment: Fragment(), MenuProvider {
 
-    private val viewModel: HomeViewModel by viewModels() {
+    private val viewModel: HomeViewModel by viewModels {
         HomeViewModel.Factory(app.dataRepository)
     }
     private val connectedViewModel: ConnectionViewModel by activityViewModels()
@@ -39,25 +39,15 @@ class HomeFragment: Fragment(), MenuProvider {
         val adapter = SearchAdapter {}
         binding.recyclerView.adapter = adapter
         binding.swipeRefreshLayout.setOnRefreshListener {
-            val hasPending = viewModel.isLoadPending
-            val wasConnected = connectedViewModel.isConnected
-            val connected = connectedViewModel.checkConnection(requireContext())
-            if (connected) {
-                // So that it does not load after loading from the connected observer
-                if (wasConnected && !hasPending) {
-                    viewModel.loadHomeData(false)
-                }
-            } else {
-                viewModel.loadHomeData(true)
-            }
+            viewModel.loadHomeData()
+        }
+        viewModel.showRefreshing.observe(viewLifecycleOwner) {
+            binding.swipeRefreshLayout.isRefreshing = it == true
         }
         viewModel.homeData.observe(viewLifecycleOwner) {
-            binding.swipeRefreshLayout.isRefreshing = false
             adapter.submitList(it)
         }
-        connectedViewModel.isConnectedData.observe(viewLifecycleOwner) {
-            if (it) viewModel.loadIfPending()
-        }
+        viewModel.loadIfNotLoaded()
         return binding.root
     }
 

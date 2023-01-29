@@ -23,9 +23,8 @@ class SearchViewModel(
         job = viewModelScope.launch(Dispatchers.IO) {
             // If the keyword is too small wait for user to type more
             if (keyword.length < 4) delay(smallSearchDelay)
-            dataRepository.getSuggestions(keyword).collect {
-                _suggestions.postValue(it)
-            }
+            val list = dataRepository.getSuggestions(keyword)
+            _suggestions.postValue(list)
         }
     }
 

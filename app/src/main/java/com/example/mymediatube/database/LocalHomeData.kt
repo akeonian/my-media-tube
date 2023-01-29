@@ -3,8 +3,8 @@ package com.example.mymediatube.database
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "search_data")
-data class LocalSearchData(
+@Entity(tableName = "home_data")
+data class LocalHomeData (
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val dataId: String,
     val title: String,
