@@ -4,7 +4,7 @@ import com.example.mymediatube.database.LocalDataDao
 import com.example.mymediatube.database.LocalHomeData
 import com.example.mymediatube.database.LocalSearchData
 
-class LocalDataSource(private val localDataDao: LocalDataDao): DataSource {
+class LocalDataSource(private val localDataDao: LocalDataDao): MutableDataSource {
 
     override suspend fun getSearchResults(query: String): List<SearchData> {
         return localDataDao.getAllSearchData().map { it.toSearchData() }

@@ -28,4 +28,8 @@ object YoutubeHelper {
         ).set("X-Android-Cert", DEBUG_SHA)
         return request.execute()
     }
+
+    fun getWatchUrl(videoId: String): String {
+        return "https://www.youtube.com/watch?v=$videoId"
+    }
 }

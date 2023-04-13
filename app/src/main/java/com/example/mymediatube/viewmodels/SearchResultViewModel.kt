@@ -38,9 +38,13 @@ class SearchResultViewModel(
             searchJob?.cancel()
             isLoading.value = true
             searchJob = viewModelScope.launch(Dispatchers.IO) {
-                val list = dataRepository.getSearchResults(query).asUIDataList()
+                val list = try {
+                    dataRepository.getSearchResults(query).asUIDataList()
+                } catch (exception: Exception) {
+                    emptyList()
+                }
                 _searchData.postValue(list)
-                isLoading.value = false
+                isLoading.postValue(false)
             }
         }
     }

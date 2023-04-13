@@ -3,6 +3,7 @@ package com.example.mymediatube.fragments
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.Toast
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -13,6 +14,7 @@ import com.example.mymediatube.adapters.SearchAdapter
 import com.example.mymediatube.databinding.FragmentSearchResultBinding
 import com.example.mymediatube.ext.activityCompat
 import com.example.mymediatube.ext.app
+import com.example.mymediatube.helper.IntentHelper
 import com.example.mymediatube.viewmodels.ConnectionViewModel
 import com.example.mymediatube.viewmodels.SearchResultViewModel
 
@@ -39,7 +41,15 @@ class SearchResultFragment: Fragment(), MenuProvider {
         activityCompat.supportActionBar?.setDisplayHomeAsUpEnabled(true)
         activityCompat.addMenuProvider(this)
 
-        val adapter = SearchAdapter {}
+        val adapter = SearchAdapter {
+            IntentHelper.openAppForUri(requireContext(), it.dataUri) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.uri_app_unavailable),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
         binding.recyclerView.adapter = adapter
         viewModel.searchData.observe(viewLifecycleOwner) {
             adapter.submitList(it)

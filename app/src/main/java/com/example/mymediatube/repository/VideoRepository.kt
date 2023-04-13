@@ -1,11 +1,12 @@
 package com.example.mymediatube.repository
 
 import com.example.mymediatube.source.DataSource
+import com.example.mymediatube.source.MutableDataSource
 import com.example.mymediatube.source.SearchData
 import java.net.UnknownHostException
 
 class VideoRepository(
-    private val localDataSource: DataSource,
+    private val localDataSource: MutableDataSource,
     private val remoteDataSource: DataSource
 ): DataRepository {
 

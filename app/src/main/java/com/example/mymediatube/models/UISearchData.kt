@@ -6,7 +6,8 @@ import androidx.recyclerview.widget.DiffUtil
 data class UISearchData(
     val id: String,
     val title: String,
-    val thumbnail: Uri
+    val thumbnail: Uri,
+    val dataUri: Uri
 ) {
 
     companion object {

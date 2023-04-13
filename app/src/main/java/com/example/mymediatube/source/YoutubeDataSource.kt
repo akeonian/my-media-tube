@@ -1,5 +1,6 @@
 package com.example.mymediatube.source
 
+import android.util.Log
 import com.example.mymediatube.ext.asSearchData
 import com.example.mymediatube.helper.YoutubeHelper
 import com.google.api.client.util.DateTime
@@ -30,14 +31,6 @@ class YoutubeDataSource(
         newSearch
     }
 
-    override suspend fun saveSearchResults(data: List<SearchData>) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun clearSearchResults() {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun getHomeData(): List<SearchData> = withContext(ioDispatcher) {
         val monthAgo = Calendar.getInstance().apply {
             add(Calendar.DAY_OF_MONTH, -30)
@@ -61,14 +54,6 @@ class YoutubeDataSource(
         channelInfo
     }
 
-    override suspend fun saveHomeData(data: List<SearchData>) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun clearHomeData() {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun getSuggestions(keyword: String): List<String> = withContext(ioDispatcher) {
         // TODO: change suggestion search strategy
         val client = YoutubeHelper.getClient()
@@ -89,6 +74,7 @@ class YoutubeDataSource(
     }
 
     companion object {
+        private const val TAG = "YoutueDataSource"
         private const val MAX_SUGGESTIONS = 6L
     }
 }

@@ -11,4 +11,5 @@
     <string name="voice_prompt_text">Search video, channels..</string>
     <string name="search_go_back">Go back</string>
     <string name="thumbnail">Thumbnail</string>
+    <string name="uri_app_unavailable">No app available to handle request</string>
 </resources>

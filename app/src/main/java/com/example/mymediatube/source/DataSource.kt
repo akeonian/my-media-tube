@@ -8,14 +8,19 @@ import com.example.mymediatube.models.UISearchData
 interface DataSource {
 
     suspend fun getSearchResults(query: String): List<SearchData>
+    suspend fun getHomeData(): List<SearchData>
+
+    suspend fun getSuggestions(keyword: String): List<String>
+}
+
+interface MutableDataSource: DataSource {
+
     suspend fun saveSearchResults(data: List<SearchData>)
     suspend fun clearSearchResults()
 
-    suspend fun getHomeData(): List<SearchData>
     suspend fun saveHomeData(data: List<SearchData>)
     suspend fun clearHomeData()
 
-    suspend fun getSuggestions(keyword: String): List<String>
 }
 
 data class SearchData(
@@ -28,21 +33,22 @@ data class SearchData(
 fun SearchData.asUIData() = UISearchData(
     id = id,
     title = title,
-    thumbnail = Uri.parse(thumbnail)
+    thumbnail = Uri.parse(thumbnail),
+    dataUri = Uri.parse(dataUri)
 )
 
 fun SearchData.asLocalHomeData() = LocalHomeData(
     dataId = id,
     title = title,
     thumbnail = thumbnail,
-    dataUri = ""
+    dataUri = dataUri
 )
 
 fun SearchData.asLocalSearchData() = LocalSearchData(
     dataId = id,
     title = title,
     thumbnail = thumbnail,
-    dataUri = ""
+    dataUri = dataUri
 )
 
 fun List<SearchData>.asUIDataList() = map { it.asUIData() }
